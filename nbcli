@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+import os
+import sys
+
+
+def main():
+    # Ensure local src package is on the path for direct execution.
+    repo_root = os.path.dirname(os.path.abspath(__file__))
+    src_path = os.path.join(repo_root, "src")
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+
+    from nbcli.cli import main as cli_main
+
+    cli_main()
+
+
+if __name__ == "__main__":
+    main()
