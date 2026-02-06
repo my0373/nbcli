@@ -5,3 +5,5 @@ __pycache__/
 .python-version
 *.pyc
 *.egg-info/
+netbox_dump.json
+netbox_dump.yaml
