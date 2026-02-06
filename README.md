@@ -73,6 +73,31 @@ Show CLI configuration:
 nbcli get cli config
 ```
 
+Show available verbs or endpoints:
+
+```
+nbcli show verbs
+nbcli show apps
+nbcli show endpoints
+nbcli show bgp
+```
+
+Dump all objects to a YAML file:
+
+```
+nbcli dump netbox_dump.yaml
+```
+
+Include jobs and object changes:
+
+```
+nbcli dump netbox_dump.yaml --include-all
+```
+
+Note: some endpoints may require filters; dump records those as errors.
+Dump files overwrite existing content and include a `netbox_data` block with
+hostname, dump time, dump timezone, and NetBox ID.
+
 ## Output formats
 
 Default output is colorful terminal text. Use one of:
@@ -108,4 +133,28 @@ To regenerate it from the live API:
 
 ```
 python scripts/generate_examples.py
+```
+
+## Shell completion
+
+Zsh completion script is available at `completions/_nbcli`:
+
+```
+autoload -Uz compinit
+compinit
+fpath=(/path/to/nbcli/completions $fpath)
+autoload -Uz _nbcli
+compdef _nbcli nbcli
+```
+
+Bash completion script is available at `completions/nbcli.bash`:
+
+```
+source /path/to/nbcli/completions/nbcli.bash
+```
+
+You can also run the helper to detect your shell:
+
+```
+./scripts/setup_completion.sh
 ```

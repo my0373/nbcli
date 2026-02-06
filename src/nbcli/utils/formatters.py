@@ -1,4 +1,5 @@
 import csv
+import io
 import json
 import sys
 
@@ -109,6 +110,19 @@ def emit_csv(fieldnames, rows):
         writer.writerow(row)
 
 
+def format_csv(payload):
+    # Serialize payloads to CSV text.
+    fieldnames, rows = normalize_csv_rows(payload)
+    if not rows:
+        return ""
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=fieldnames)
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(row)
+    return buffer.getvalue()
+
+
 def output_payload(payload, fmt, allow_color):
     # Dispatch output based on the selected format.
     if fmt == "json":
@@ -122,3 +136,14 @@ def output_payload(payload, fmt, allow_color):
         emit_csv(fieldnames, rows)
         return
     print(format_kv(payload, allow_color))
+
+
+def serialize_payload(payload, fmt):
+    # Convert payload to a string format for file output.
+    if fmt == "json":
+        return format_json(payload)
+    if fmt == "yaml":
+        return format_yaml(payload)
+    if fmt == "csv":
+        return format_csv(payload)
+    return format_kv(payload, False)

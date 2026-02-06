@@ -17,6 +17,15 @@ Show CLI configuration:
 ./nbcli get cli config
 ```
 
+Show available verbs or endpoints:
+
+```
+./nbcli show verbs
+./nbcli show apps
+./nbcli show endpoints
+./nbcli show bgp
+```
+
 Select a single value from the CLI config:
 
 ```
@@ -37,6 +46,12 @@ Output formats:
 ./nbcli get status --csv
 ```
 
+Dump all objects to YAML:
+
+```
+./nbcli dump netbox_dump.yaml
+```
+
 ## NetBox API examples
 
 The commands below use endpoints discovered from `/api/` on your NetBox instance.
@@ -45,6 +60,12 @@ Get API status:
 
 ```
 ./nbcli get status
+```
+
+Dump the full API dataset:
+
+```
+./nbcli dump netbox_dump.yaml
 ```
 
 Select a single value from a response:
