@@ -20,36 +20,51 @@ source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
+3. Install the CLI entrypoint:
+
+```
+uv pip install -e .
+```
+
 ## Usage
 
 Check API status:
 
 ```
-python nbcli.py status
+nbcli status
 ```
 
 Or, using the simple get form:
 
 ```
-python nbcli.py get status
+nbcli get status
+```
+
+Output formats (default is colorful terminal output):
+
+```
+nbcli get status --plain
+nbcli get status --json
+nbcli get status --yaml
+nbcli get status --csv
 ```
 
 Get a specific object:
 
 ```
-python nbcli.py get dcim/devices/1
+nbcli get dcim/devices/1
 ```
 
 List an endpoint (first page):
 
 ```
-python nbcli.py list dcim/devices --param limit=50
+nbcli list dcim/devices --param limit=50
 ```
 
 List all results across pages:
 
 ```
-python nbcli.py list dcim/devices --all
+nbcli list dcim/devices --all
 ```
 
 ## Notes

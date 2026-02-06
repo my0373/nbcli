@@ -1,11 +1,12 @@
 import argparse
-import json
 import os
 import sys
 from urllib.parse import urlsplit, urlunsplit
 
 import requests
 from dotenv import load_dotenv
+
+from nbcli.utils.formatters import output_payload, output_status
 
 
 def load_config():
@@ -105,13 +106,6 @@ def request_all(url, token, params, timeout, verify):
     return {"count": len(results), "results": results}
 
 
-def output_json(payload, compact):
-    if compact:
-        print(json.dumps(payload))
-    else:
-        print(json.dumps(payload, indent=2, sort_keys=True))
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="Interrogate a NetBox 4.4 API from the command line."
@@ -127,11 +121,18 @@ def main():
         action="store_true",
         help="Disable TLS certificate verification",
     )
-    parser.add_argument(
-        "--compact",
-        action="store_true",
-        help="Print compact JSON instead of pretty output",
+
+    format_group = parser.add_mutually_exclusive_group()
+    format_group.add_argument(
+        "--plain", action="store_true", help="Print plain text output"
     )
+    format_group.add_argument(
+        "--json", action="store_true", help="Print JSON output"
+    )
+    format_group.add_argument(
+        "--yaml", action="store_true", help="Print YAML output"
+    )
+    format_group.add_argument("--csv", action="store_true", help="Print CSV output")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -166,6 +167,16 @@ def main():
     base_url, token = load_config()
     verify = not args.insecure
     params = parse_kv_list(getattr(args, "param", None))
+    fmt = "pretty"
+    if args.plain:
+        fmt = "plain"
+    elif args.json:
+        fmt = "json"
+    elif args.yaml:
+        fmt = "yaml"
+    elif args.csv:
+        fmt = "csv"
+    allow_color = fmt == "pretty" and sys.stdout.isatty()
 
     if args.command == "status":
         url = ensure_trailing_slash(build_url(base_url, "status"))
@@ -173,10 +184,9 @@ def main():
         version = None
         if isinstance(payload, dict):
             version = payload.get("netbox-version") or payload.get("netbox_version")
-        if version:
-            print(f"NetBox version: {version}")
-        else:
-            output_json(payload, args.compact)
+        if version and output_status(version, fmt, allow_color):
+            return
+        output_payload(payload, fmt, allow_color)
         return
 
     if args.command == "get":
@@ -188,14 +198,13 @@ def main():
                 version = payload.get("netbox-version") or payload.get(
                     "netbox_version"
                 )
-            if version:
-                print(f"NetBox version: {version}")
-            else:
-                output_json(payload, args.compact)
+            if version and output_status(version, fmt, allow_color):
+                return
+            output_payload(payload, fmt, allow_color)
             return
         url = ensure_trailing_slash(build_url(base_url, args.path))
         payload = request_json("GET", url, token, params, args.timeout, verify)
-        output_json(payload, args.compact)
+        output_payload(payload, fmt, allow_color)
         return
 
     if args.command == "list":
@@ -204,7 +213,7 @@ def main():
             payload = request_all(url, token, params, args.timeout, verify)
         else:
             payload = request_json("GET", url, token, params, args.timeout, verify)
-        output_json(payload, args.compact)
+        output_payload(payload, fmt, allow_color)
         return
 
 

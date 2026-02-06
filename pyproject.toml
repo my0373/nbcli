@@ -1,0 +1,14 @@
+[project]
+name = "nbcli"
+version = "0.1.0"
+description = "Command-line tool to interrogate a NetBox 4.4 API."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "python-dotenv",
+  "pyyaml",
+  "requests",
+]
+
+[project.scripts]
+nbcli = "nbcli.cli:main"
